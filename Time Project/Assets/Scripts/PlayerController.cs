@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     private CharacterController controller;
     public float speed = 3f;
+    [SerializeField]
     private Vector3 velocity;
     private float gravityForce = -9.81f;
     public Transform groundCheck;
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundMask;
     private bool isGrounded;
     public float jumpHeight = 3f;
+    public Animator animator;
     
     // Start is called before the first frame update
     void Start()
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour
     {
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        animator.SetBool("InAir", !isGrounded);
 
         if (isGrounded && velocity.y < 0)
         {
@@ -40,15 +43,16 @@ public class PlayerController : MonoBehaviour
         Transform cameraTransform = Camera.main.transform;
         Vector3 forward = cameraTransform.forward;
         forward.y = 0;
-        forward.Normalize();
 
         Vector3 right = cameraTransform.right;
         right.y = 0;
-        right.Normalize();
         
         Vector3 moveVector = (right * x) + (forward * z);
+        moveVector.Normalize();
 
         controller.Move(moveVector * speed * Time.deltaTime);
+        transform.LookAt(transform.position + moveVector);
+        animator.SetFloat("speed", moveVector.magnitude * speed * Time.deltaTime);
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
