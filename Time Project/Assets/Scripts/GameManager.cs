@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum GameState { PLAYING, WON, LOST, MENU };
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
     private GameState _currentGameState = GameState.PLAYING;
     GameState currentGameState {get {return _currentGameState;}}
@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        OnGameStateUpdated += DisplayNewState;
     }
 
     // Update is called once per frame
