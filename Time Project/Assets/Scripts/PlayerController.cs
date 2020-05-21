@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     public float jumpHeight = 3f;
     public Animator animator;
+    public bool isSlowed = false;
     
     // Start is called before the first frame update
     void Start()
@@ -50,9 +51,10 @@ public class PlayerController : MonoBehaviour
         Vector3 moveVector = (right * x) + (forward * z);
         moveVector.Normalize();
 
-        controller.Move(moveVector * speed * Time.deltaTime);
+        controller.Move(moveVector * speed * Time.deltaTime * (isSlowed ? SlowdownStatics.PLAYER_SLOWDOWN : 1f));
         transform.LookAt(transform.position + moveVector);
         animator.SetFloat("speed", moveVector.magnitude * speed * Time.deltaTime);
+        animator.SetFloat("animPlaybackSpeed", isSlowed ? SlowdownStatics.PLAYER_SLOWDOWN : 1f);
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -63,5 +65,25 @@ public class PlayerController : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
+    }
+
+    void OnTriggerEnter(Collider otherCollider)
+    {
+        Debug.Log("Entered Trigger: " + otherCollider.gameObject.tag);
+        if (otherCollider.tag == "Slowdown")
+        {
+            Debug.Log("2");
+            isSlowed = true;
+        }
+    }
+
+    void OnTriggerExit(Collider otherCollider)
+    {
+        Debug.Log("Exited Trigger: " + otherCollider.name);
+        if (otherCollider.tag == "Slowdown")
+        {
+            Debug.Log("4");
+            isSlowed = false;
+        }
     }
 }
